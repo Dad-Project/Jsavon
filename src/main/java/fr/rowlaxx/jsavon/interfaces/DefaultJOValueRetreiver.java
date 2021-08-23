@@ -55,5 +55,4 @@ public class DefaultJOValueRetreiver implements JOValueRetreiver {
 	protected <T> T getDefaultValue(JSONObject json, Field field, Class<T> type) {
 		return null;
 	}
-
 }

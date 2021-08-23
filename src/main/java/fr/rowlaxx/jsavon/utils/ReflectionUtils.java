@@ -23,4 +23,44 @@ public class ReflectionUtils {
 		return fields;
 	}
 	
+	public static boolean isPrimitive(Class<?> clazz) {
+		if (clazz.isPrimitive())
+			return true;
+		return 	clazz == Boolean.class || 
+				clazz == Void.class || 
+				clazz == Byte.class || 
+				clazz == Short.class || 
+				clazz == Integer.class || 
+				clazz == Long.class || 
+				clazz == Double.class || 
+				clazz == Float.class ||
+				clazz == Void.class;
+	}
+	
+	public static final Class<?> toWrapper(Class<?> clazz){
+		if (!clazz.isPrimitive())
+			return clazz;
+		
+		if (clazz == int.class) 	return Integer.class;
+		if (clazz == double.class) 	return Double.class;
+		if (clazz == byte.class)	return Byte.class;
+		if (clazz == short.class)	return Short.class;
+		if (clazz == long.class)	return Long.class;
+		if (clazz == float.class)	return Float.class;
+		if (clazz == boolean.class)	return Boolean.class;
+		else						return Void.class;
+	}
+	
+	public static Object valueOf(Class<?> destination, String str) {
+		destination = toWrapper(destination);
+		if (destination == Double.class) 	return Double.valueOf(str);
+		if (destination == Float.class)		return Float.valueOf(str);
+		if (destination == Boolean.class)	return Boolean.valueOf(str);
+		if (destination == Byte.class)		return Byte.valueOf(str);
+		if (destination == Short.class)		return Short.valueOf(str);
+		if (destination == Integer.class)	return Integer.valueOf(str);
+		if (destination == Long.class)		return Long.valueOf(str);
+		throw new IllegalArgumentException("Unknow destination : " + destination);
+	}
+	
 }
