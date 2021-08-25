@@ -41,6 +41,4 @@ public @interface JOValue {
 	 * @return true si le paramètre est mandatoire
 	 */
 	public boolean mandatory() default true;
-	
-	public Class<? extends JOValueRetreiver> retreiver() default DefaultJOValueRetreiver.class;
 }

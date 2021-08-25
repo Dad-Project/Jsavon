@@ -11,6 +11,9 @@ import fr.rowlaxx.jsavon.utils.ConvertUtils;
 
 public class DefaultJOValueRetreiver implements JOValueRetreiver {
 
+	//Instance
+	public static final DefaultJOValueRetreiver INSTANCE = new DefaultJOValueRetreiver();
+	
 	//Methodes reecrites
 	@Override
 	@SuppressWarnings("unchecked")
@@ -28,7 +31,7 @@ public class DefaultJOValueRetreiver implements JOValueRetreiver {
 				if (object == null)
 					continue;
 				
-				return ConvertUtils.convert(object, returnType);
+				return convert(object, returnType);
 			}
 		}
 		
@@ -54,5 +57,9 @@ public class DefaultJOValueRetreiver implements JOValueRetreiver {
 	//Methodess default
 	protected <T> T getDefaultValue(JSONObject json, Field field, Class<T> type) {
 		return null;
+	}
+	
+	protected <T> T convert(Object object, Class<T> destination) {
+		return ConvertUtils.convert(object, destination);
 	}
 }
