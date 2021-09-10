@@ -37,18 +37,19 @@ public class ReflectionUtils {
 				clazz == Void.class;
 	}
 	
-	public static final Class<?> toWrapper(Class<?> clazz){
+	@SuppressWarnings("unchecked")
+	public static final <T> Class<T> toWrapper(Class<T> clazz){
 		if (!clazz.isPrimitive())
 			return clazz;
 		
-		if (clazz == int.class) 	return Integer.class;
-		if (clazz == double.class) 	return Double.class;
-		if (clazz == byte.class)	return Byte.class;
-		if (clazz == short.class)	return Short.class;
-		if (clazz == long.class)	return Long.class;
-		if (clazz == float.class)	return Float.class;
-		if (clazz == boolean.class)	return Boolean.class;
-		else						return Void.class;
+		if (clazz == int.class) 	return (Class<T>) Integer.class;
+		if (clazz == double.class) 	return (Class<T>) Double.class;
+		if (clazz == byte.class)	return (Class<T>) Byte.class;
+		if (clazz == short.class)	return (Class<T>) Short.class;
+		if (clazz == long.class)	return (Class<T>) Long.class;
+		if (clazz == float.class)	return (Class<T>) Float.class;
+		if (clazz == boolean.class)	return (Class<T>) Boolean.class;
+		else						return (Class<T>) Void.class;
 	}
 	
 	public static Object valueOf(Class<?> destination, String str) {

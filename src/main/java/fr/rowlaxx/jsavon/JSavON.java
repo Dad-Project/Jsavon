@@ -1,5 +1,6 @@
 package fr.rowlaxx.jsavon;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -7,7 +8,8 @@ import java.util.List;
 import fr.rowlaxx.jsavon.annotations.Exclude;
 import fr.rowlaxx.jsavon.utils.ReflectionUtils;
 
-public abstract class JSavON {
+public abstract class JSavON implements Serializable {
+	private static final long serialVersionUID = -6972113327092008717L;
 
 	//Constructeurs
 	protected JSavON() {
@@ -45,7 +47,7 @@ public abstract class JSavON {
 				sb.append( field.get(this).toString() );
 				sb.append(", ");
 			} catch (IllegalAccessException e) {
-				throw new JSavONException("The Field \"" + field.getName() + "\" objectis enforcing Java language access control and the underlyingfield is inaccessible.");
+				e.printStackTrace();//This exception should not be thrown.
 			}
 		}
 		
@@ -91,9 +93,9 @@ public abstract class JSavON {
 				if (!o1.equals(o2))
 					return false;
 			} catch(IllegalAccessException e) {
-				throw new JSavONException("The Field \"" + field.getName() + "\" objectis enforcing Java language access control and the underlyingfield is inaccessible.");
+				e.printStackTrace();//This exception should not be thrown.
 			} catch(NoSuchFieldException e) {
-				throw new JSavONException("Unable to find the corresponding field.");
+				e.printStackTrace();//This exception should not be thrown since the class are the same.
 			}
 		}
 		return true;
@@ -123,7 +125,7 @@ public abstract class JSavON {
 				temp = field.get(this).hashCode();
 				result = prime * result + (temp ^ (temp >>> 32));
 			}catch(IllegalAccessException e) {
-				throw new JSavONException("The Field \"" + field.getName() + "\" objectis enforcing Java language access control and the underlyingfield is inaccessible.");
+				e.printStackTrace();//This exception should not be thrown.
 			}
 		}
 		return result;

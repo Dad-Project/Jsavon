@@ -6,33 +6,40 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import fr.rowlaxx.jsavon.interfaces.DefaultJOValueRetreiver;
-import fr.rowlaxx.jsavon.interfaces.JOValueRetreiver;
-
 @Retention(RUNTIME)
 @Target(FIELD)
 public @interface JOValue {
 	
 	/**
 	 * La clé dans le Json qui représente cette variable
-	 * La prémière clé trouvée sera utilisée, négligeant les suivantes
-	 * Si une clé existante ne permet pas l'assignation de la valeur, une erreur sera lancée.
+	 * La prémière clé trouvée sera utilisée, terminant la recherche
 	 * 
-	 * Si key vaut "", alors le nom déclaré de la variable sera utilisé
+	 * Vous pouvez utiliser un chemin à condition que le chemin ne commence pas par le séparateur
+	 * Le séparateur est '/'
+	 * 
+	 * Si une clé existante ne permet pas l'assignation de la valeur, une erreur sera envoyée.
+	 * 
+	 * Si key vaut {}, alors le nom déclaré de la variable sera utilisé
 	 * 
 	 * @return la liste des clés possibles.
 	 */
-	public String[] key() default "";
+	public String[] key() default {};
 	
 	/**
-	 * Les chemins possible dans le Json
-	 * Chaque chemin sera testé
-	 * Dés qu'une valeur est trouvée, les chemins suivants seront négligés
+	 * Les chemins possible 
+	 * Chaque chemin sera testé dans l'ordre de déclaration
+	 * Pour chaque chemin, toutes les clés seront testées
+	 * 
+	 * La prémière clé trouvée sera utilisée, terminant la recherche
+	 * 
 	 * Le séparateur est '/'
-	 * Le chemin root est "" ou "/"
+	 * Le chemin root est "/"
+	 * 
+	 * Par défault, seul le chemin root est utilisé
+	 * 
 	 * @return la liste des chemins possibles.
 	 */
-	public String[] path() default "";
+	public String[] path() default {};
 	
 	/**
 	 * représente l'obligation de présence d'une valeur

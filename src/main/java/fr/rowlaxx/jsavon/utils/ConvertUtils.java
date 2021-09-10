@@ -1,28 +1,52 @@
 package fr.rowlaxx.jsavon.utils;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.json.JSONArray;
-
 import fr.rowlaxx.jsavon.JSavONArray;
-import fr.rowlaxx.jsavon.JSavONException;
 import fr.rowlaxx.jsavon.JSavONObject;
 import fr.rowlaxx.jsavon.annotations.EnumMatcher;
+import fr.rowlaxx.jsavon.annotations.object.JOMapKey;
+import fr.rowlaxx.jsavon.exceptions.JSavONException;
 
 public class ConvertUtils {
 
 	@SuppressWarnings("unchecked")
-	public static final <T> T convert(Object object, Class<T> destination) {
+	public static final <T> T convert(Object object, Type type, AnnotatedElement element) {
+		Objects.requireNonNull(type, "type may not be null.");
 		if (object == null)
 			return null;
+				
+		Class<T> destination;
+		Type[] types;
+		if (type instanceof Class) {
+			destination = (Class<T>) type;
+			types = null;
+		}
+		else if (type instanceof ParameterizedType) {
+			destination = (Class<T>) ((ParameterizedType) type).getRawType();
+			types = ((ParameterizedType) type).getActualTypeArguments();
+		}
+		else
+			throw new UnsupportedOperationException();
+		
+		System.out.println(object.getClass() + " -> " + destination + "   " + Arrays.toString(types));
+		
+		destination = ReflectionUtils.toWrapper(destination);
 		if (object.getClass() == destination)
 			return (T) object;
 		
@@ -33,19 +57,23 @@ public class ConvertUtils {
 			return convertToPrimitiv(object, destination);
 		if (destination.isEnum())
 			return convertToEnum(object, (Class<T>) destination);
-		if (destination.isAssignableFrom(List.class))
-			return (T) convertToList(object);
-		if (destination.isAssignableFrom(Set.class))
-			return (T) convertToSet(object);
-		if (destination.isAssignableFrom(Map.class))
-			return (T) convertToMap(object);
-		if (destination.isAssignableFrom(JSavONObject.class) || destination.isAssignableFrom(JSavONArray.class))
+		if (destination == Class.class)
+			return (T) convertToClass(object);
+		
+		if (List.class == destination)
+			return (T) convertToList(object, types[0]);
+		if (Set.class == destination)
+			return (T) convertToSet(object, types[0]);
+		if (Map.class == destination)
+			return (T) convertToMap(object, types[1], element);
+		
+		if (JSavONObject.class.isAssignableFrom(destination) || JSavONArray.class.isAssignableFrom(destination))
 			return instanciate(destination, object);
 		
 		try {
 			return instanciate(destination, object);
 		}catch(JSavONException e) {
-			throw new IllegalArgumentException("Unknow destination.");
+			throw new IllegalArgumentException("Unknow destination : " + object.getClass() + " -> " + destination);
 		}
 	}
 	
@@ -73,6 +101,7 @@ public class ConvertUtils {
 	@SuppressWarnings("unchecked")
 	public static final <T> T convertToPrimitiv(Object object, Class<T> destination) {
 		Objects.requireNonNull(object, "object may noy be null.");
+		destination = ReflectionUtils.toWrapper(destination);
 		if (ReflectionUtils.isPrimitive(object.getClass()))
 			return destination.cast(object);
 		if (object instanceof String)
@@ -170,33 +199,74 @@ public class ConvertUtils {
 		} 
 	}
 	
-	public static final <T> List<T> convertToList(Object object, Class<T> destination) {
-		if (object == null)
-			return null;
+	public static final <T> List<T> convertToList(Object object, Type type) {
+		Objects.requireNonNull(type, "type may not be null.");
+		Objects.requireNonNull(object, "object may not be null.");
 		
-		if (object instanceof JSONArray)
-			return convertToList((JSONArray)object, destination);
-		if (object instanceof Collection<?>)
+		if (object instanceof Object[] ) {
+			final List<T> list = new ArrayList<>();
+			for (Object obj : (Object[])object)
+				list.add( convert(obj, type, null) );
+			return Collections.unmodifiableList(list);
+		}
+		else if (object instanceof Iterable) {
+			final List<T> list = new ArrayList<>();
+			for (Object obj : (Iterable<?>)object)
+				list.add( convert(obj, type, null) );
+			return Collections.unmodifiableList(list);
+		}
+		
+		throw new JSavONException("Cannot convert a " + object.getClass() + " to a list.");
 	}
 	
-	public static final <T> List<T> convertToList(JSONArray array, Class<T> destination) {
-		final ArrayList<T> list = new ArrayList<>(array.length());
-		
-		for (int i = 0 ; i < array.length() ; i++)
-			list.add( convert(array.get(i), destination) );
-		
-		return list;
+	public static final <T> Set<T> convertToSet(Object object, Type type) {
+		final Set<T> set = new HashSet<>();
+		try {
+			set.addAll( convertToList(object, type) );
+		}catch(JSavONException e) {
+			throw new JSavONException("Cannot convert a " + object.getClass() + " to a set.");
+		}
+		return Collections.unmodifiableSet(set);
 	}
 	
-	public static final <T> List<T> ConvertToList(JSONArray array, Class<T> destination){
+	@SuppressWarnings("unchecked")
+	public static final <K, V> Map<K, V> convertToMap(Object object, String keyFieldName, Type value) {
+		Objects.requireNonNull(object, "object may not be null.");
+		Objects.requireNonNull(value, "value may not be null.");
+		Objects.requireNonNull(keyFieldName, "keyFieldName may not be null.");
+				
+		try {
+			if (object instanceof Object[] ) {
+				final Map<K, V> map = new HashMap<>();
+				Object key;
+				for (Object obj : (Object[])object) {
+					obj = convert(obj, value, null);
+					key = obj.getClass().getField(keyFieldName).get(obj);
+					map.put( (K)key, (V)obj);
+				}
+				return Collections.unmodifiableMap(map);
+			}
+			else if (object instanceof Iterable) {
+				final Map<K, V> map = new HashMap<>();
+				Object key;
+				for (Object obj : (Iterable<?>)object) {
+					obj = convert(obj, value, null);
+					key = obj.getClass().getField(keyFieldName).get(obj);
+					map.put( (K)key, (V)obj);
+				}
+				return Collections.unmodifiableMap(map);
+			}
+		} catch( NoSuchFieldException | IllegalAccessException e) {
+			throw new JSavONException(e);
+		}
 		
+		
+		throw new JSavONException("Cannot convert a " + object.getClass() + " to a map.");
 	}
 	
-	public static final Set<T> convertToSet(Object object) {
-		
-	}
-	
-	public static final Map<K, V> convertToMap(Object object) {
-		
+	public static final <K, V> Map<K, V> convertToMap(Object object, Type value, AnnotatedElement element) {
+		if (element.isAnnotationPresent(JOMapKey.class))
+			return convertToMap(object, element.getAnnotation(JOMapKey.class).fieldName(), value);
+		throw new UnsupportedOperationException();
 	}
 }
