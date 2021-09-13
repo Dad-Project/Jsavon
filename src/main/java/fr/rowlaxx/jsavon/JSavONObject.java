@@ -32,7 +32,7 @@ public class JSavONObject extends JSavON {
 	}
 	
 	//Init
-	private void init(JSONObject json) {
+	private final void init(JSONObject json) {
 		final List<Field> fields = ReflectionUtils.getAllFields(this.getClass());
 		JORetriever joRetriever;
 		JOValueRetreiver joValueRetreiver;
@@ -48,7 +48,7 @@ public class JSavONObject extends JSavON {
 			
 			try {
 				field.setAccessible(true);
-				field.set(this, joValueRetreiver.getValue(json, field));
+				field.set(this, joValueRetreiver.getValue(this, json, field));
 			} catch(IllegalAccessException e) {
 				e.printStackTrace();//This error should never be thrown
 			}
