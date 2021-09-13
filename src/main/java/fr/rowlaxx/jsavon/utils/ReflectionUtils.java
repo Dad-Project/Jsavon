@@ -23,6 +23,18 @@ public class ReflectionUtils {
 		return fields;
 	}
 	
+	public static Field getDeclaredField(String fieldName, Class<?> clazz) {
+		
+		while (clazz != Object.class) {
+			try {
+				return clazz.getDeclaredField(fieldName);
+			}catch(NoSuchFieldException e) {
+				clazz = clazz.getSuperclass();
+			}
+		}
+		throw new IllegalArgumentException("No field \"" + fieldName + "\" exists for the class " + clazz);
+	}
+	
 	public static boolean isPrimitive(Class<?> clazz) {
 		if (clazz.isPrimitive())
 			return true;
