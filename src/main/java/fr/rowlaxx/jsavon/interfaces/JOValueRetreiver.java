@@ -6,6 +6,6 @@ import org.json.JSONObject;
 
 public interface JOValueRetreiver {
 	
-	public <T> T getValue(final JSONObject json, final Field field);
+	public <T> T getValue(final Object object, final JSONObject json, final Field field);
 
 }
