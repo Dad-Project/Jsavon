@@ -9,7 +9,7 @@ import java.util.Objects;
 import fr.rowlaxx.jsavon.annotations.Exclude;
 import fr.rowlaxx.jsavon.utils.ReflectionUtils;
 
-public abstract class JSavON implements Serializable {
+abstract class JSavON implements Serializable {
 	private static final long serialVersionUID = -6972113327092008717L;
 
 	//Constructeurs
