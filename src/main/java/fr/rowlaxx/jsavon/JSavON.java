@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Objects;
 
 import fr.rowlaxx.jsavon.annotations.Exclude;
 import fr.rowlaxx.jsavon.utils.ReflectionUtils;
@@ -26,7 +27,7 @@ public abstract class JSavON implements Serializable {
 		
 		final StringBuilder sb = new StringBuilder();
 		sb.append(getClass().getSimpleName() );
-		sb.append(" ]");
+		sb.append(" [");
 		
 		Exclude exclude;
 		for (Field field : fields) {
@@ -44,7 +45,7 @@ public abstract class JSavON implements Serializable {
 				field.setAccessible(true);
 				sb.append( field.getName() );
 				sb.append('=');
-				sb.append( field.get(this).toString() );
+				sb.append( (Object)field.get(this) );
 				sb.append(", ");
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();//This exception should not be thrown.
@@ -69,7 +70,6 @@ public abstract class JSavON implements Serializable {
 			return false;
 
 		Object o1, o2;
-		Field otherField;
 		Exclude exclude;
 		for (Field field : ReflectionUtils.getAllFields(getClass())) {
 			//Si le field est statique, on l'ignore
@@ -83,19 +83,15 @@ public abstract class JSavON implements Serializable {
 			
 			try {
 				//On récupère les valeurs
-				otherField = obj.getClass().getDeclaredField( field.getName() );
 				field.setAccessible(true);
-				otherField.setAccessible(true);
 				o1 = field.get(this);
-				o2 = otherField.get(this);
+				o2 = field.get(obj);
 				
 				//On vérifie l'égalité
-				if (!o1.equals(o2))
+				if (!Objects.equals(o1, o2))
 					return false;
 			} catch(IllegalAccessException e) {
 				e.printStackTrace();//This exception should not be thrown.
-			} catch(NoSuchFieldException e) {
-				e.printStackTrace();//This exception should not be thrown since the class are the same.
 			}
 		}
 		return true;
@@ -122,7 +118,7 @@ public abstract class JSavON implements Serializable {
 			try {
 				//On obtient le hashcode
 				field.setAccessible(true);
-				temp = field.get(this).hashCode();
+				temp = Objects.hashCode(field.get(this));
 				result = prime * result + (temp ^ (temp >>> 32));
 			}catch(IllegalAccessException e) {
 				e.printStackTrace();//This exception should not be thrown.
