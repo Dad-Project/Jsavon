@@ -9,9 +9,9 @@ import java.util.Objects;
 
 import org.json.JSONObject;
 
-import fr.rowlaxx.jsavon.annotations.Exclude;
+import fr.rowlaxx.jsavon.annotations.ExcludeFrom;
+import fr.rowlaxx.jsavon.annotations.ManualValue;
 import fr.rowlaxx.jsavon.annotations.object.JORetriever;
-import fr.rowlaxx.jsavon.annotations.object.JOValue;
 import fr.rowlaxx.jsavon.exceptions.JSavONRetrieverInstanciationException;
 import fr.rowlaxx.jsavon.impl.DefaultJOValueRetreiver;
 import fr.rowlaxx.jsavon.interfaces.JOValueRetreiver;
@@ -21,7 +21,7 @@ public class JSavONObject extends JSavON {
 	private static final long serialVersionUID = -7239433548141209455L;
 	
 	//Variables
-	@Exclude(excludeFromEquals = true, excludeFromHashCode = true, excludeFromToString = true)
+	@ExcludeFrom(fromEquals = true, fromHashCode = true, fromToString = true)
 	private transient final HashMap<Class<? extends JOValueRetreiver>, JOValueRetreiver> retrievers = new HashMap<>();
 	
 	//Constructeurs
@@ -34,13 +34,14 @@ public class JSavONObject extends JSavON {
 	//Init
 	private final void init(JSONObject json) {
 		final List<Field> fields = ReflectionUtils.getAllFields(this.getClass());
+
 		JORetriever joRetriever;
 		JOValueRetreiver joValueRetreiver;
+		
 		for (Field field : fields) {
 			if (Modifier.isStatic(field.getModifiers()))
 				continue;
-			
-			if (!field.isAnnotationPresent(JOValue.class))
+			if (field.isAnnotationPresent(ManualValue.class))
 				continue;
 			
 			joRetriever = field.getAnnotation(JORetriever.class);

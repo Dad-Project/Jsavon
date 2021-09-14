@@ -7,9 +7,9 @@ import java.lang.annotation.Target;
 
 @Target(value = ElementType.FIELD )
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface Exclude {
+public @interface ExcludeFrom {
 
-	public boolean excludeFromToString();
-	public boolean excludeFromHashCode();
-	public boolean excludeFromEquals();
+	public boolean fromToString();
+	public boolean fromHashCode();
+	public boolean fromEquals();
 }

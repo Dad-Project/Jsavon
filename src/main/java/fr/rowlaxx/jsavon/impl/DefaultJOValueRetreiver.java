@@ -22,14 +22,21 @@ public class DefaultJOValueRetreiver implements JOValueRetreiver {
 	public <T> T getValue(final Object instance, final JSONObject root, final Field field) {
 		final JOValue jovalue = field.getAnnotation(JOValue.class);
 		
-		final String[] paths = (jovalue.path().length == 0) ? new String[]{""} : jovalue.path();
-		final String[] keys = (jovalue.key().length == 0) ? new String[] {field.getName()} : jovalue.key();
+		String[] paths, keys;
+		
+		if (jovalue == null) {
+			paths = new String[] {""};
+			keys = new String[] {field.getName()};
+		}
+		else {
+			paths = jovalue.path().length == 0 ? new String[]{""} : jovalue.path();
+			keys = jovalue.key().length == 0 ? new String[] {field.getName()} : jovalue.key();
+		}
 		
 		final Destination<T> destination = (Destination<T>) DestinationResolver.resolve(field, instance);
 		ConvertRequest<T> request;
 		JSONObject json;
 		Object object;
-		
 						
 		for (String path : paths ) {
 			json = goToPath(root, path);

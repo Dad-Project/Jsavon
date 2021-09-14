@@ -6,7 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Objects;
 
-import fr.rowlaxx.jsavon.annotations.Exclude;
+import fr.rowlaxx.jsavon.annotations.ExcludeFrom;
 import fr.rowlaxx.jsavon.utils.ReflectionUtils;
 
 abstract class JSavON implements Serializable {
@@ -29,14 +29,14 @@ abstract class JSavON implements Serializable {
 		sb.append(getClass().getSimpleName() );
 		sb.append(" [");
 		
-		Exclude exclude;
+		ExcludeFrom exclude;
 		for (Field field : fields) {
 			//Si le field est statique, on l'ignore
 			if (Modifier.isStatic(field.getModifiers()))
 				continue;
 			
 			//Si le field contient l'annotation exclude, on vérifie
-			if ((exclude = field.getAnnotation(Exclude.class) ) != null)
+			if ((exclude = field.getAnnotation(ExcludeFrom.class) ) != null)
 				if (exclude.excludeFromToString())
 					continue;
 			
@@ -70,14 +70,14 @@ abstract class JSavON implements Serializable {
 			return false;
 
 		Object o1, o2;
-		Exclude exclude;
+		ExcludeFrom exclude;
 		for (Field field : ReflectionUtils.getAllFields(getClass())) {
 			//Si le field est statique, on l'ignore
 			if (Modifier.isStatic(field.getModifiers()))
 				continue;
 			
 			//Si le field contient l'annotation exclude, on vérifie
-			if ((exclude = field.getAnnotation(Exclude.class) ) != null)
+			if ((exclude = field.getAnnotation(ExcludeFrom.class) ) != null)
 				if (exclude.excludeFromEquals())
 					continue;
 			
@@ -104,14 +104,14 @@ abstract class JSavON implements Serializable {
 		int result = 1;
 		int temp;
 
-		Exclude exclude;
+		ExcludeFrom exclude;
 		for (Field field : ReflectionUtils.getAllFields(getClass()) ) {
 			//Si le field est statique, on l'ignore
 			if (Modifier.isStatic(field.getModifiers()))
 				continue;
 			
 			//Si le field contient l'annotation exclude, on vérifie
-			if ((exclude = field.getAnnotation(Exclude.class) ) != null)
+			if ((exclude = field.getAnnotation(ExcludeFrom.class) ) != null)
 				if (exclude.excludeFromHashCode())
 					continue;
 
