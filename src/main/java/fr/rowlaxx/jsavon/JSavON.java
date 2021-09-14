@@ -37,7 +37,7 @@ abstract class JSavON implements Serializable {
 			
 			//Si le field contient l'annotation exclude, on vérifie
 			if ((exclude = field.getAnnotation(ExcludeFrom.class) ) != null)
-				if (exclude.excludeFromToString())
+				if (exclude.fromToString())
 					continue;
 			
 			try {
@@ -78,7 +78,7 @@ abstract class JSavON implements Serializable {
 			
 			//Si le field contient l'annotation exclude, on vérifie
 			if ((exclude = field.getAnnotation(ExcludeFrom.class) ) != null)
-				if (exclude.excludeFromEquals())
+				if (exclude.fromEquals())
 					continue;
 			
 			try {
@@ -112,7 +112,7 @@ abstract class JSavON implements Serializable {
 			
 			//Si le field contient l'annotation exclude, on vérifie
 			if ((exclude = field.getAnnotation(ExcludeFrom.class) ) != null)
-				if (exclude.excludeFromHashCode())
+				if (exclude.fromHashCode())
 					continue;
 
 			try {

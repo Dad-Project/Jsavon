@@ -22,6 +22,7 @@ public class JSavONObject extends JSavON {
 	
 	//Variables
 	@ExcludeFrom(fromEquals = true, fromHashCode = true, fromToString = true)
+	@ManualValue
 	private transient final HashMap<Class<? extends JOValueRetreiver>, JOValueRetreiver> retrievers = new HashMap<>();
 	
 	//Constructeurs
