@@ -12,6 +12,6 @@ import fr.rowlaxx.jsavon.interfaces.JOValueRetreiver;
 @Target(FIELD)
 public @interface JORetriever {
 	
-	public Class<? extends JOValueRetreiver> retreiver();
+	public Class<? extends JOValueRetreiver> retriever();
 
 }

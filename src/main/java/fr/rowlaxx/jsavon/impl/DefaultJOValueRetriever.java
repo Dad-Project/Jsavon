@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import fr.rowlaxx.jsavon.JSavONObject;
 import fr.rowlaxx.jsavon.annotations.object.JOValue;
 import fr.rowlaxx.jsavon.convert.ConvertRequest;
 import fr.rowlaxx.jsavon.convert.Destination;
@@ -11,15 +12,15 @@ import fr.rowlaxx.jsavon.convert.DestinationResolver;
 import fr.rowlaxx.jsavon.exceptions.JSavONException;
 import fr.rowlaxx.jsavon.interfaces.JOValueRetreiver;
 
-public class DefaultJOValueRetreiver implements JOValueRetreiver {
+public class DefaultJOValueRetriever implements JOValueRetreiver {
 
 	//Instance
-	public static final DefaultJOValueRetreiver INSTANCE = new DefaultJOValueRetreiver();
+	public static final DefaultJOValueRetriever INSTANCE = new DefaultJOValueRetriever();
 	
 	//Methodes reecrites
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getValue(final Object instance, final JSONObject root, final Field field) {
+	public <T> T getValue(final JSavONObject instance, final JSONObject root, final Field field) {
 		final JOValue jovalue = field.getAnnotation(JOValue.class);
 		
 		String[] paths, keys;
