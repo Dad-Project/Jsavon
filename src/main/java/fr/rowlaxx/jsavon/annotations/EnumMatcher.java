@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Target(FIELD)
 public @interface EnumMatcher {
 
-	public String[] possibleMatchs();
+	public String[] possibleMatchs() default {};
 	public boolean caseSensitiv() default true;
 	
 }

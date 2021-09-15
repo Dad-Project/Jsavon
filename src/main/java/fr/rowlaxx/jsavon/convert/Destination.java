@@ -7,6 +7,11 @@ import fr.rowlaxx.jsavon.utils.ReflectionUtils;
 
 public class Destination<T> {
 
+	//Methodes statiques
+	public static <T> Destination<T> from(Class<T> clazz){
+		return new Destination<T>(clazz);
+	}
+	
 	//Builder
 	public static final class Builder {
 		

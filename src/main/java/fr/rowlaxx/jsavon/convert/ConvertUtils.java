@@ -9,9 +9,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import org.json.JSONObject;
 
 import fr.rowlaxx.jsavon.JSavONArray;
 import fr.rowlaxx.jsavon.JSavONObject;
@@ -46,8 +49,10 @@ class ConvertUtils {
 		else if (destination.is(Map.class)) {
 			if (destination instanceof MapDestination)
 				return (T) convertToMap(object, ((MapDestination<?,?>) destination).getStringMapKey(), destination.getGenericParameter(0), destination.getGenericParameter(1));
+			else if (object instanceof JSONObject)
+				return (T) convertToMap( (JSONObject)object, destination.getGenericParameter(0), destination.getGenericParameter(1));
 			else
-				throw new JSavONException("Map conversion must be done with the MapDestination object.");
+				throw new JSavONException("This Map conversion must be done with the MapDestination object.");
 		}
 		else if (JSavONObject.class.isAssignableFrom(destination.getDestinationClass()))
 			return instanciate(destination, object);
@@ -58,8 +63,8 @@ class ConvertUtils {
 	}
 	
 	static final String convertToString(Object object) {
-		if (object instanceof Number)
-			return String.format("%.8f", object);
+		if (object instanceof Double || object instanceof Float)
+			return String.format(Locale.US, "%.8f", object);
 		return object.toString();
 	}
 	
@@ -91,7 +96,8 @@ class ConvertUtils {
 				if (!field.isEnumConstant())
 					continue;
 				if ( (enumMatcher = field.getDeclaredAnnotation(EnumMatcher.class)) != null ) {
-					for (String possibleName : enumMatcher.possibleMatchs())
+					final String[] possibleMatchs = enumMatcher.possibleMatchs().length == 0 ? new String[] {field.getName()} : enumMatcher.possibleMatchs();
+					for (String possibleName : possibleMatchs)
 						if (	(enumMatcher.caseSensitiv()  && possibleName.equals(object.toString())) ||
 								(!enumMatcher.caseSensitiv() && possibleName.equalsIgnoreCase(object.toString())))
 							try {
@@ -115,7 +121,7 @@ class ConvertUtils {
 					return value;
 			}
 		}
-		throw new IllegalArgumentException("Cannot convert " + object + " to a " + destination);
+		throw new IllegalArgumentException("Cannot convert " + object.getClass() + ":" + object + " to a " + destination);
 	}
 
 	static final <T> void addAll(Collection<T> collection, Destination<T> destination, Object toAdd) {
@@ -177,5 +183,17 @@ class ConvertUtils {
 		} catch (IllegalAccessException e) {
 			throw new JSavONException("cannot access the field " + keyFieldName);
 		} 
+	}
+	
+	static final <K, V> Map<K, V> convertToMap(JSONObject json, Destination<K> keyDestination, Destination<V> valueDestination){
+		final Map<K, V> map = new HashMap<>();
+		K key;
+		V value;
+		for (String k : json.keySet()) {
+			key = convert(k, keyDestination);
+			value = convert(json.get(k), valueDestination);
+			map.put(key, value);
+		}
+		return Collections.unmodifiableMap(map);
 	}
 }

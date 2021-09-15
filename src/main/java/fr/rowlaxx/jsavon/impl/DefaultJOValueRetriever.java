@@ -52,7 +52,7 @@ public class DefaultJOValueRetriever implements JOValueRetreiver {
 				}
 		}
 		
-		if (jovalue.mandatory())
+		if (jovalue == null ? true : jovalue.mandatory())
 			throw new JSavONException("Unable to find a value for the field \"" + field.getName() + "\".");
 		return null;
 	}

@@ -126,4 +126,9 @@ abstract class JSavON implements Serializable {
 		}
 		return result;
 	}
+	
+	//Methodes
+	public final void print() {
+		System.out.println(this);
+	}
 }
