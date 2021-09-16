@@ -89,6 +89,8 @@ class ConvertUtils {
 	
 	static final Object convertToEnum(Object object, Destination<?> destination) {
 		if (object instanceof String) {
+			if (((String) object).isBlank())
+				return null;
 			
 			//On regarde pour l'annotation ValueMatcher
 			EnumMatcher enumMatcher;
@@ -156,7 +158,7 @@ class ConvertUtils {
 			return constructor.newInstance(args);
 			
 		} catch (NoSuchMethodException e) {
-			throw new JSavONException("No constructor has been found.");
+			throw new JSavONException("No constructor has been found for the destination " + destination);
 		} catch (InstantiationException e) {
 			throw new JSavONException("The desired return type is abstract.");
 		} catch (IllegalAccessException e) {
