@@ -66,7 +66,7 @@ public class MyObject extends JSavONObject {
 
 # Information
 
-This library is mainly used in JBinanceAPI but you can use it for any other project
+This library is mainly used in JBinanceAPI but you can use it for any other project  
 There are a lot more you can do with this library, like customizing retrieving algorithm, parsing JSONArray...
 
 # Donation
