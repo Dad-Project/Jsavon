@@ -1,6 +1,6 @@
 # JSavON
-A simple java JSON deserializer that can convert a JSON into a java object in an easy way
-This library provide a strong object convertion 
+A simple java JSON deserializer that can convert a JSON into a java object in an easy way.  
+This library also provide a strong object convertion.
 
 # Deserializing JSONObject
 We have this JSONObject : 
