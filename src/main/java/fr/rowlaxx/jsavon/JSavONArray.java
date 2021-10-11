@@ -30,6 +30,10 @@ public abstract class JSavONArray extends JSavON {
 		init(array);
 	}
 	
+	public JSavONArray() {
+		super();
+	}
+	
 	//init
 	private final void init(JSONArray array) {
 		final List<Field> fields = ReflectionUtils.getAllFields(this.getClass());
