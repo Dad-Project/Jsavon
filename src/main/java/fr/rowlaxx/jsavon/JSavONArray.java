@@ -16,7 +16,7 @@ import fr.rowlaxx.jsavon.impl.DefaultJAValueRetriever;
 import fr.rowlaxx.jsavon.interfaces.JAValueRetriever;
 import fr.rowlaxx.jsavon.utils.ReflectionUtils;
 
-public class JSavONArray extends JSavON {
+public abstract class JSavONArray extends JSavON {
 	private static final long serialVersionUID = -2584160215002397493L;
 
 	//Variables

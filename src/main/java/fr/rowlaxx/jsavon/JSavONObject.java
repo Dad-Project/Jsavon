@@ -17,7 +17,7 @@ import fr.rowlaxx.jsavon.impl.DefaultJOValueRetriever;
 import fr.rowlaxx.jsavon.interfaces.JOValueRetreiver;
 import fr.rowlaxx.jsavon.utils.ReflectionUtils;
 
-public class JSavONObject extends JSavON {
+public abstract class JSavONObject extends JSavON {
 	private static final long serialVersionUID = -7239433548141209455L;
 	
 	//Variables
@@ -30,6 +30,10 @@ public class JSavONObject extends JSavON {
 		super();
 		Objects.requireNonNull(json, "json may not be null.");
 		init(json);
+	}
+	
+	public JSavONObject() {
+		super();
 	}
 	
 	//Init

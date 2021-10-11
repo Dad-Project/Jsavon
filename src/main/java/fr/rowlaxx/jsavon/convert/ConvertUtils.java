@@ -3,6 +3,7 @@ package fr.rowlaxx.jsavon.convert;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,8 +17,7 @@ import java.util.Set;
 
 import org.json.JSONObject;
 
-import fr.rowlaxx.jsavon.JSavONArray;
-import fr.rowlaxx.jsavon.JSavONObject;
+import fr.rowlaxx.jsavon.JSavON;
 import fr.rowlaxx.jsavon.annotations.EnumMatcher;
 import fr.rowlaxx.jsavon.exceptions.JSavONException;
 import fr.rowlaxx.jsavon.utils.IterableArray;
@@ -54,10 +54,8 @@ class ConvertUtils {
 			else
 				throw new JSavONException("This Map conversion must be done with the MapDestination object.");
 		}
-		else if (JSavONObject.class.isAssignableFrom(destination.getDestinationClass()))
-			return instanciate(destination, object);
-		else if (JSavONArray.class.isAssignableFrom(destination.getDestinationClass()))
-			return instanciate(destination, object);
+		else if (JSavON.class.isAssignableFrom(destination.getDestinationClass()))
+			return convertToJSavON(object, destination);
 		
 		throw new IllegalArgumentException("Unknow destination : " + object.getClass() + " -> " + destination);
 	}
@@ -81,7 +79,7 @@ class ConvertUtils {
 	
 	static final Object convertToPrimitiv(Object object, Destination<?> destination) {
 		if (ReflectionUtils.isPrimitive(object.getClass()))
-			return destination.getDestinationClass().cast(object);
+			return object;
 		if (object instanceof String)
 			return ReflectionUtils.valueOf(destination.getDestinationClass(), object.toString());
 		throw new IllegalArgumentException("Cannot convert this object to " + destination);
@@ -146,6 +144,54 @@ class ConvertUtils {
 		final Set<T> set = new HashSet<>();
 		addAll(set, destination, object);
 		return Collections.unmodifiableSet(set);
+	}
+	
+	static final <T> T convertToJSavON(Object object, Destination<T> destination){
+		if (object instanceof JSONObject)
+			if (((JSONObject) object).has("class"))
+				try {
+					final String classString = ((JSONObject)object).getString("class");
+					@SuppressWarnings("unchecked")
+					final Class<T> clazz = (Class<T>) Class.forName(classString);
+					JSavON.checkIO(clazz);
+					
+					final Constructor<T> constructor = clazz.getConstructor();
+					constructor.setAccessible(true);
+					
+					final T instance = constructor.newInstance();
+					completeJSavON( (JSavON) instance, (JSONObject)object);
+					return instance;
+				}catch(Exception e) {
+					throw new JSavONException(e);
+				}
+		
+		return instanciate(destination, object);
+	}
+	
+	static final <T extends JSavON> void completeJSavON(T instance, JSONObject json) {
+		Destination<?> destination;
+		ConvertRequest<?> convertRequest;
+		Object value;
+		
+		for (Field field : ReflectionUtils.getAllFields(instance.getClass())) {
+			if (Modifier.isStatic(field.getModifiers()))
+				continue;
+			if (Modifier.isTransient(field.getModifiers()))
+				continue;
+			field.setAccessible(true);
+			
+			value = json.opt(field.getName());
+			if (value == null)
+				continue;
+			
+			destination = DestinationResolver.resolve(field, null);
+			convertRequest = new ConvertRequest<>(value, destination);
+			try {
+				field.set(instance, convertRequest.execute());
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	static final <T> T instanciate(Destination<T> destination, Object... args) {
