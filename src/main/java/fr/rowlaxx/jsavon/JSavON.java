@@ -192,7 +192,7 @@ public abstract class JSavON implements Serializable {
 		checkIO(getClass());
 
 		final JSONObject json = new JSONObject();
-		json.put("class", getClass().toString() );
+		json.put("class", getClass().getName() );
 
 		Object value;
 		for (Field field : ReflectionUtils.getAllFields(getClass())) {
