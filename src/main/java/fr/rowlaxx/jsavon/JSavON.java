@@ -161,7 +161,7 @@ public abstract class JSavON implements Serializable {
 		Objects.requireNonNull(object, "object may not be null.");
 		Objects.requireNonNull(os, "os may not be null.");
 
-		final byte[] toWrite = object.toJson().toString().getBytes();
+		final byte[] toWrite = object.toJson(true).toString().getBytes();
 		os.write(toWrite);
 		if (close)
 			os.close();
@@ -188,11 +188,12 @@ public abstract class JSavON implements Serializable {
 	}
 
 	//ToJson
-	public JSONObject toJson() {
+	public JSONObject toJson(boolean addClassPrecision) {
 		checkIO(getClass());
 
 		final JSONObject json = new JSONObject();
-		json.put("class", getClass().getName() );
+		if (addClassPrecision)
+			json.put("class", getClass().getName() );
 
 		Object value;
 		for (Field field : ReflectionUtils.getAllFields(getClass())) {
@@ -204,7 +205,7 @@ public abstract class JSavON implements Serializable {
 			field.setAccessible(true);
 
 			try {
-				value = convert(field.get(this));
+				value = convert(field.get(this), addClassPrecision);
 				json.put(field.getName(), value);
 			} catch(IllegalAccessException e) {
 				e.printStackTrace();
@@ -213,8 +214,12 @@ public abstract class JSavON implements Serializable {
 
 		return json;
 	}
+	
+	public JSONObject toJson() {
+		return toJson(false);
+	}
 
-	private final static Object convert(Object value) {
+	private final static Object convert(Object value, boolean addClassPrecision) {
 		if (ReflectionUtils.isPrimitive(value.getClass()))
 			return value;
 		if (value instanceof String)
@@ -224,19 +229,19 @@ public abstract class JSavON implements Serializable {
 		if (value.getClass().isEnum())
 			return value.toString();
 		if (value instanceof JSavON)
-			return ((JSavON) value).toJson();
+			return ((JSavON) value).toJson(addClassPrecision);
 		if (value.getClass().isArray())
-			return convert(new IterableArray<>((Object[])value) );
+			return convert(new IterableArray<>((Object[])value), addClassPrecision);
 		if (value instanceof Iterable) {
 			final JSONArray array = new JSONArray();
 			for (Object v : (Iterable<?>)value)
-				array.put( convert(v) );
+				array.put( convert(v, addClassPrecision) );
 			return array;
 		}
 		if (value instanceof Map) {
 			final JSONObject json = new JSONObject();
 			for (Entry<?,?> entry : ((Map<?,?>)value).entrySet() )
-				json.put(convert(entry.getKey()).toString(), convert(entry.getValue()));
+				json.put(convert(entry.getKey(), addClassPrecision).toString(), convert(entry.getValue(), addClassPrecision));
 			return json;
 		}
 		throw new IllegalArgumentException("Cannot put the object " + value + " in the json.");
