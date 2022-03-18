@@ -1,4 +1,4 @@
-package fr.rowlaxx.jsavon.exceptions;
+package fr.rowlaxx.jsavon;
 
 public class JsavonException extends RuntimeException {
 

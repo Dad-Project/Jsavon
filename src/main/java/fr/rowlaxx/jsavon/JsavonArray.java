@@ -6,11 +6,10 @@ import org.json.JSONArray;
 
 import fr.rowlaxx.jsavon.annotations.JAValue;
 import fr.rowlaxx.jsavon.annotations.ManualValue;
-import fr.rowlaxx.jsavon.exceptions.JsavonException;
 import fr.rowlaxx.utils.generic.ReflectionUtils;
 import fr.rowlaxx.utils.generic.destination.Destination;
 
-public abstract class JsavonArray extends Jsavon {
+public abstract class JsavonArray extends JsavonBase {
 	private static final long serialVersionUID = -2584160215002397493L;
 
 	//Constructeurs
