@@ -24,6 +24,11 @@ public class JsavonFactory {
 	public JsavonFactory(Converter converter) {
 		this.converter = Objects.requireNonNull(converter, "converter may not be null.");
 	}
+	
+	//Getters
+	public Converter getConverter() {
+		return converter;
+	}
 
 	//Parse
 	public <T extends JsavonBase> T parse(JSONObject json) throws ClassNotFoundException {

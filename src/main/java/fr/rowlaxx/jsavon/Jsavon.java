@@ -14,27 +14,33 @@ import fr.rowlaxx.jsavon.annotations.JAValue;
 import fr.rowlaxx.jsavon.annotations.JOValue;
 import fr.rowlaxx.jsavon.annotations.ManualValue;
 import fr.rowlaxx.jsavon.annotations.MapKey;
+import fr.rowlaxx.jsavon.converters.JSONArrayConverter;
+import fr.rowlaxx.jsavon.converters.JSONObjectConverter;
 import fr.rowlaxx.jsavon.converters.JsavonArrayConverter;
+import fr.rowlaxx.jsavon.converters.JsavonObjectConverter;
 import fr.rowlaxx.utils.GenericUtils;
 import fr.rowlaxx.utils.ReflectionUtils;
 
 public final class Jsavon {
 
 	//Factory
-	private static final JsavonFactory factory = new JsavonFactory(ConverterFactory.newDefaultInstance()
+	public static final JsavonFactory defaultFactory = new JsavonFactory(ConverterFactory.newDefaultInstance()
 			.addSimpleConverter(new JsavonArrayConverter())
+			.addSimpleConverter(new JsavonObjectConverter())
+			.addSimpleConverter(new JSONObjectConverter())
+			.addSimpleConverter(new JSONArrayConverter())
 			.build());
 	
 	public static final <T extends JsavonBase> T parse(JSONObject json) throws ClassNotFoundException {
-		return factory.parse(json);
+		return defaultFactory.parse(json);
 	}
 	
 	public static final <T extends JsavonBase> T parse(Object object, Class<T> destination) {
-		return factory.parse(object, destination);
+		return defaultFactory.parse(object, destination);
 	}
 	
 	public static final JSONObject toJson(JsavonBase base) {
-		return factory.toJson(base);
+		return defaultFactory.toJson(base);
 	}
 	
 	//Verified
