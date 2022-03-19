@@ -1,42 +1,42 @@
-package fr.rowlaxx.jsavon;
+package fr.rowlaxx.jsavon.converters;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Objects;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import fr.rowlaxx.convertutils.Converter;
+import fr.rowlaxx.convertutils.ConvertMethod;
+import fr.rowlaxx.convertutils.Return;
+import fr.rowlaxx.convertutils.SimpleConverter;
+import fr.rowlaxx.jsavon.Jsavon;
+import fr.rowlaxx.jsavon.JsavonArray;
+import fr.rowlaxx.jsavon.JsavonBase;
+import fr.rowlaxx.jsavon.JsavonException;
 import fr.rowlaxx.jsavon.annotations.JAValue;
 import fr.rowlaxx.jsavon.annotations.JOValue;
 import fr.rowlaxx.jsavon.annotations.ManualValue;
 import fr.rowlaxx.utils.ReflectionUtils;
 
-public class JsavonFactory {
-
-	//Variables
-	private final Converter converter;
+@Return(canReturnInnerType = true)
+public class JsavonBaseConverter extends SimpleConverter<JsavonBase> {
 
 	//Constructeurs
-	public JsavonFactory(Converter converter) {
-		this.converter = Objects.requireNonNull(converter, "converter may not be null.");
+	public JsavonBaseConverter() {
+		super(JsavonBase.class);
 	}
 	
-	//Getters
-	public Converter getConverter() {
-		return converter;
-	}
-
-	//Parse
-	public <T extends JsavonBase> T parse(JSONObject json) throws ClassNotFoundException {
-		final Class<T> clazz = converter.convert(json.get("class"), Class.class);
-		return parse(json, clazz);
+	//Methodes
+	@ConvertMethod
+	public <T extends JsavonArray> T toJsavon(JSONObject json) {
+		@SuppressWarnings("unchecked")
+		final Class<T> clazz = (Class<T>)getConverter().convert(json.get("class"), Class.class);
+		return toJsavon(json, clazz);
 	}
 	
-	public <T extends JsavonBase> T parse(Object json, Class<T> destination) {
+	@ConvertMethod
+	public <T extends JsavonBase> T toJsavon(Object json, Class<T> destination) {
 		Objects.requireNonNull(json, "json may not be null.");
 		Objects.requireNonNull(destination, "destination may not be null.");
 		
@@ -65,7 +65,7 @@ public class JsavonFactory {
 			else
 				value = getValue((JSONArray)json, field);
 			
-			value = converter.convert(value, types[i]);
+			value = getConverter().convert(value, types[i]);
 			ReflectionUtils.trySet(field, instance, value);
 		}
 		
@@ -122,36 +122,5 @@ public class JsavonFactory {
 			throw new JsavonException("Annotation JAValue must be present for the field " + field);
 		
 		return (T) array.get(jaValue.index());
-	}
-	
-	//ToJson
-	public JSONObject toJson(JsavonBase jsavon) {
-		Objects.requireNonNull(jsavon, "jsavon may not be null.");
-		
-		final JSONObject json = new JSONObject();
-		final Jsavon.Entry entry = Jsavon.getEntry(jsavon.getClass());
-
-		json.put("class", (String)converter.convert(jsavon.getClass(), String.class));
-		
-		final Field[] fields = entry.getFields();		
-		Object rawValue, newValue;
-		
-		for (Field field : fields) {
-			rawValue = ReflectionUtils.tryGet(field, jsavon);
-			if (rawValue == null)
-				newValue = null;
-			else if (rawValue instanceof Collection)
-				newValue = converter.convert(rawValue, JSONArray.class);
-			else if (rawValue instanceof Map || rawValue instanceof JsavonBase)
-				newValue = converter.convert(rawValue, JSONObject.class);
-			else if (rawValue instanceof Boolean || rawValue instanceof Number || rawValue instanceof JSONArray)
-				newValue = rawValue;
-			else
-				throw new JsavonException("Unknow type : " + rawValue.getClass());
-			
-			json.put(field.getName(), newValue);
-		}
-		
-		return json;
 	}
 }

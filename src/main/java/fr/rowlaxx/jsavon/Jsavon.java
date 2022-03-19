@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import fr.rowlaxx.convertutils.Converter;
 import fr.rowlaxx.convertutils.ConverterFactory;
 import fr.rowlaxx.jsavon.annotations.JAValue;
 import fr.rowlaxx.jsavon.annotations.JOValue;
@@ -16,43 +17,42 @@ import fr.rowlaxx.jsavon.annotations.ManualValue;
 import fr.rowlaxx.jsavon.annotations.MapKey;
 import fr.rowlaxx.jsavon.converters.JSONArrayConverter;
 import fr.rowlaxx.jsavon.converters.JSONObjectConverter;
-import fr.rowlaxx.jsavon.converters.JsavonArrayConverter;
-import fr.rowlaxx.jsavon.converters.JsavonObjectConverter;
+import fr.rowlaxx.jsavon.converters.JsavonBaseConverter;
 import fr.rowlaxx.utils.GenericUtils;
 import fr.rowlaxx.utils.ReflectionUtils;
 
 public final class Jsavon {
 
 	//Factory
-	public static final JsavonFactory defaultFactory = new JsavonFactory(ConverterFactory.newDefaultInstance()
-			.addSimpleConverter(new JsavonArrayConverter())
-			.addSimpleConverter(new JsavonObjectConverter())
+	public static final Converter converter = ConverterFactory
+			.newDefaultInstance()
+			.addSimpleConverter(new JsavonBaseConverter())
 			.addSimpleConverter(new JSONObjectConverter())
 			.addSimpleConverter(new JSONArrayConverter())
-			.build());
+			.build();
 	
-	public static final <T extends JsavonBase> T parse(JSONObject json) throws ClassNotFoundException {
-		return defaultFactory.parse(json);
+	public <T extends JsavonBase> T parse(Object json, Class<T> destination) {
+		return converter.convert(json, destination);
 	}
 	
-	public static final <T extends JsavonBase> T parse(Object object, Class<T> destination) {
-		return defaultFactory.parse(object, destination);
+	public <T extends JsavonBase> T parse(JSONObject json) {
+		return converter.convert(json, JsavonBase.class);
 	}
 	
 	public static final JSONObject toJson(JsavonBase base) {
-		return defaultFactory.toJson(base);
+		return converter.convert(base, JSONObject.class);
 	}
 	
 	//Verified
 	private static final Map<Class<? extends JsavonBase>, Entry> entries = new HashMap<>();
 	
-	static class Entry {
+	public static class Entry {
 		private static void verify(Class<?> clazz, Field field) {
 			final JAValue jaValue = field.getAnnotation(JAValue.class);
 			final JOValue joValue = field.getAnnotation(JOValue.class);
 			final boolean manualValue = field.isAnnotationPresent(ManualValue.class);
 			final boolean mapKey = field.isAnnotationPresent(MapKey.class);
-			
+						
 			if (manualValue)
 				if (jaValue != null || joValue != null || mapKey)
 					throw new JsavonException("A ManualValue field must not contains other annotation.");
@@ -62,7 +62,7 @@ public final class Jsavon {
 			if (JsavonObject.class.isAssignableFrom(clazz) && jaValue != null)
 				throw new JsavonException("JAValue annotation may not be present here.");
 			
-			if (mapKey && Map.class.isAssignableFrom(GenericUtils.resolveClass(field.getGenericType(), clazz)));
+			if (mapKey && Map.class.isAssignableFrom(GenericUtils.resolveClass(field.getGenericType(), clazz)))
 				throw new JsavonException("A MapKey annotation may only be present on a map object.");
 		}
 		
@@ -105,19 +105,19 @@ public final class Jsavon {
 		
 		private void check() {
 			if (exception != null)
-				throw new JsavonException("class " + clazz + " is not correct : " + exception.getMessage());
+				throw new JsavonException(clazz + " is not correct : " + exception.getMessage());
 		}
 		
-		Field[] getFields() {
+		public Field[] getFields() {
 			return fields;
 		}
 		
-		Type[] getResolvedFieldTypes() {
+		public Type[] getResolvedFieldTypes() {
 			return fieldsType;
 		}
 	}
 	
-	static final Entry getEntry(Class<? extends JsavonBase> clazz) {
+	public static final Entry getEntry(Class<? extends JsavonBase> clazz) {
 		Entry entry = entries.get(clazz);
 		
 		if (entry == null)
@@ -131,7 +131,7 @@ public final class Jsavon {
 		return entry;
 	}	
 	
-	static final void check(Class<? extends JsavonBase> clazz) {
+	public static final void check(Class<? extends JsavonBase> clazz) {
 		getEntry(clazz).check();
 	}
 }
