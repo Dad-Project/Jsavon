@@ -28,14 +28,14 @@ public class JsavonBaseConverter extends SimpleConverter<JsavonBase> {
 	}
 	
 	//Methodes
-	@ConvertMethod
+	@ConvertMethod(priority = 0)
 	public <T extends JsavonArray> T toJsavon(JSONObject json) {
 		@SuppressWarnings("unchecked")
 		final Class<T> clazz = (Class<T>)getConverter().convert(json.get("class"), Class.class);
 		return toJsavon(json, clazz);
 	}
 	
-	@ConvertMethod
+	@ConvertMethod(priority = 1)
 	public <T extends JsavonBase> T toJsavon(Object json, Class<T> destination) {
 		Objects.requireNonNull(json, "json may not be null.");
 		Objects.requireNonNull(destination, "destination may not be null.");

@@ -11,10 +11,10 @@ import org.json.JSONObject;
 
 import fr.rowlaxx.convertutils.Converter;
 import fr.rowlaxx.convertutils.ConverterFactory;
+import fr.rowlaxx.convertutils.MapKey;
 import fr.rowlaxx.jsavon.annotations.JAValue;
 import fr.rowlaxx.jsavon.annotations.JOValue;
 import fr.rowlaxx.jsavon.annotations.ManualValue;
-import fr.rowlaxx.jsavon.annotations.MapKey;
 import fr.rowlaxx.jsavon.converters.JSONArrayConverter;
 import fr.rowlaxx.jsavon.converters.JSONObjectConverter;
 import fr.rowlaxx.jsavon.converters.JsavonBaseConverter;
