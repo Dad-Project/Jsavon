@@ -36,7 +36,9 @@ public class JSONArrayConverter extends SimpleConverter<JSONArray> {
 			return getConverter().convert(rawValue, JSONArray.class);
 		else if (rawValue instanceof Map || rawValue instanceof JsavonBase)
 			return getConverter().convert(rawValue, JSONObject.class);
-		else if (rawValue instanceof Boolean || rawValue instanceof Number || rawValue instanceof JSONArray || rawValue instanceof JSONObject)
+		else if (rawValue instanceof Enum)
+			return getConverter().convert(rawValue, String.class);
+		else if (rawValue instanceof Boolean || rawValue instanceof Number || rawValue instanceof String || rawValue instanceof JSONObject)
 			return rawValue;
 		else
 			throw new JsavonException("Unknow type : " + rawValue.getClass());

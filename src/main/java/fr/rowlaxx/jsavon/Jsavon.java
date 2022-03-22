@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import fr.rowlaxx.convertutils.Converter;
 import fr.rowlaxx.convertutils.ConverterFactory;
 import fr.rowlaxx.convertutils.MapKey;
+import fr.rowlaxx.convertutils.MapKeyType;
 import fr.rowlaxx.jsavon.annotations.JAValue;
 import fr.rowlaxx.jsavon.annotations.JOValue;
 import fr.rowlaxx.jsavon.annotations.ManualValue;
@@ -62,8 +63,8 @@ public final class Jsavon {
 			if (JsavonObject.class.isAssignableFrom(clazz) && jaValue != null)
 				throw new JsavonException("JAValue annotation may not be present here.");
 			
-			if (mapKey && Map.class.isAssignableFrom(GenericUtils.resolveClass(field.getGenericType(), clazz)))
-				throw new JsavonException("A MapKey annotation may only be present on a map object.");
+			if (mapKey && !Map.class.isAssignableFrom(GenericUtils.resolveClass(field.getGenericType(), clazz)))
+				throw new JsavonException("A MapKey annotation may only be present on the field " + field);
 		}
 		
 		private final Exception exception;
@@ -99,7 +100,12 @@ public final class Jsavon {
 			this.fieldsType = new Type[fields.size()];
 			for (int i = 0 ; i < fields.size() ; i++) {
 				verify(clazz, this.fields[i]);
-				this.fieldsType[i] = GenericUtils.resolve(this.fields[i].getGenericType(), clazz);
+				try {
+					this.fieldsType[i] = MapKeyType.from(this.fields[i], clazz);
+				}
+				catch(IllegalArgumentException e) {
+					this.fieldsType[i] = GenericUtils.resolve(this.fields[i].getGenericType(), clazz);
+				}
 			}
 		}
 		

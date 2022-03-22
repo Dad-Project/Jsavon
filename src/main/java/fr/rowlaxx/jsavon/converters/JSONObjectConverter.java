@@ -1,7 +1,6 @@
 package fr.rowlaxx.jsavon.converters;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -48,15 +47,22 @@ public class JSONObjectConverter extends SimpleConverter<JSONObject> {
 	}
 
 	@ConvertMethod
-	public JSONObject toJson(Map<String,?> map) {
+	public JSONObject toJson(Map<?,?> map) {
 		Objects.requireNonNull(map, "map may not be null.");
 		Object rawValue, newValue;
+		Object rawKey;
+		String newKey;
 		
 		final JSONObject json = new JSONObject();
-		for (Entry<String, ?> entry : map.entrySet()) {
+		for (Entry<?, ?> entry : map.entrySet()) {
 			rawValue = entry.getValue();
 			newValue = toJsonItem(rawValue);
-			json.put(entry.getKey(), newValue);
+			rawKey = entry.getKey();
+			newKey = getConverter().convert(rawKey, String.class);
+			
+			System.out.println(rawKey + "  " + rawValue);
+			
+			json.put(newKey, newValue);
 		}
 		
 		return json;
@@ -65,11 +71,13 @@ public class JSONObjectConverter extends SimpleConverter<JSONObject> {
 	private Object toJsonItem(Object rawValue) {
 		if (rawValue == null)
 			return null;
-		else if (rawValue instanceof Collection)
+		else if (rawValue instanceof Iterable)
 			return getConverter().convert(rawValue, JSONArray.class);
 		else if (rawValue instanceof Map || rawValue instanceof JsavonBase)
 			return getConverter().convert(rawValue, JSONObject.class);
-		else if (rawValue instanceof Boolean || rawValue instanceof Number || rawValue instanceof JSONArray || rawValue instanceof JSONObject)
+		else if (rawValue instanceof Enum)
+			return getConverter().convert(rawValue, String.class);
+		else if (rawValue instanceof Boolean || rawValue instanceof Number || rawValue instanceof JSONObject || rawValue instanceof String)
 			return rawValue;
 		else
 			throw new JsavonException("Unknow type : " + rawValue.getClass());

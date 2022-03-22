@@ -30,9 +30,15 @@ public class JsavonBaseConverter extends SimpleConverter<JsavonBase> {
 	//Methodes
 	@ConvertMethod(priority = 0)
 	public <T extends JsavonArray> T toJsavon(JSONObject json) {
-		@SuppressWarnings("unchecked")
-		final Class<T> clazz = (Class<T>)getConverter().convert(json.get("class"), Class.class);
-		return toJsavon(json, clazz);
+		try {
+			@SuppressWarnings("unchecked")
+			final Class<T> clazz = (Class<T>)getConverter().convert(json.get("class"), Class.class);
+			return toJsavon(json, clazz);
+		}catch(Exception e) {
+			//System.out.println(json.toString(2));
+			throw e;
+		}
+		
 	}
 	
 	@ConvertMethod(priority = 1)
@@ -77,6 +83,9 @@ public class JsavonBaseConverter extends SimpleConverter<JsavonBase> {
 			return json;
 		
 		final String[] paths = fullPath.split("/");
+		if (paths.length == 0)
+			return json;
+		
 		for (int i = 0 ; i < paths.length-1 ; i++) {
 			if (paths[i].isBlank())
 				continue;

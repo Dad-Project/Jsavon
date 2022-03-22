@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
+import org.json.JSONObject;
+
 import fr.rowlaxx.jsavon.annotations.ExcludeFrom;
 import fr.rowlaxx.utils.ReflectionUtils;
 
@@ -90,5 +92,9 @@ public abstract class JsavonBase implements Serializable {
 			result = prime * result + (temp ^ (temp >>> 32));
 		}
 		return result;
+	}
+	
+	public JSONObject toJson() {
+		return Jsavon.toJson(this);
 	}
 }
