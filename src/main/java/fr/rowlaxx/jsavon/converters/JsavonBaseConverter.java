@@ -92,7 +92,7 @@ public class JsavonBaseConverter extends SimpleConverter<JsavonBase> {
 			json = json.getJSONObject(paths[i]);
 		}
 		
-		return json.get(paths[paths.length-1]);
+		return json.opt(paths[paths.length-1]);
 	}
 	
 	@SuppressWarnings("unchecked")
