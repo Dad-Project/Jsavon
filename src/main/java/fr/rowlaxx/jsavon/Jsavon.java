@@ -19,6 +19,7 @@ import fr.rowlaxx.jsavon.annotations.ManualValue;
 import fr.rowlaxx.jsavon.converters.JSONArrayConverter;
 import fr.rowlaxx.jsavon.converters.JSONObjectConverter;
 import fr.rowlaxx.jsavon.converters.JsavonBaseConverter;
+import fr.rowlaxx.jsavon.converters.MapConverterV2;
 import fr.rowlaxx.utils.GenericUtils;
 import fr.rowlaxx.utils.ReflectionUtils;
 
@@ -30,6 +31,7 @@ public final class Jsavon {
 			.addSimpleConverter(new JsavonBaseConverter())
 			.addSimpleConverter(new JSONObjectConverter())
 			.addSimpleConverter(new JSONArrayConverter())
+			.addSimpleConverter(new MapConverterV2())
 			.build();
 	
 	public <T extends JsavonBase> T parse(Object json, Class<T> destination) {
