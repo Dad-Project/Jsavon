@@ -37,10 +37,6 @@ public final class Jsavon {
 		return converter.convert(json, destination);
 	}
 	
-	public <T extends JsavonBase> T parse(JSONObject json) {
-		return converter.convert(json, JsavonBase.class);
-	}
-	
 	public static final JSONObject toJson(JsavonBase base) {
 		return converter.convert(base, JSONObject.class);
 	}
