@@ -26,12 +26,11 @@ import fr.rowlaxx.utils.ReflectionUtils;
 public final class Jsavon {
 
 	//Factory
-	public static final Converter converter = ConverterFactory
-			.newDefaultInstance()
-			.addSimpleConverter(new JsavonBaseConverter())
-			.addSimpleConverter(new JSONObjectConverter())
-			.addSimpleConverter(new JSONArrayConverter())
-			.addSimpleConverter(new MapConverterV2())
+	public static final Converter converter = ConverterFactory.defaultBuilder()
+			.putSimpleConverter(new JsavonBaseConverter())
+			.putSimpleConverter(new JSONObjectConverter())
+			.putSimpleConverter(new JSONArrayConverter())
+			.putSimpleConverter(new MapConverterV2())
 			.build();
 	
 	public <T extends JsavonBase> T parse(Object json, Class<T> destination) {

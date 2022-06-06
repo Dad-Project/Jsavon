@@ -8,10 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import fr.rowlaxx.convertutils.ConvertMethod;
-import fr.rowlaxx.convertutils.Return;
 import fr.rowlaxx.convertutils.SimpleConverter;
 import fr.rowlaxx.jsavon.Jsavon;
-import fr.rowlaxx.jsavon.JsavonArray;
 import fr.rowlaxx.jsavon.JsavonBase;
 import fr.rowlaxx.jsavon.JsavonException;
 import fr.rowlaxx.jsavon.annotations.JAValue;
@@ -19,7 +17,6 @@ import fr.rowlaxx.jsavon.annotations.JOValue;
 import fr.rowlaxx.jsavon.annotations.ManualValue;
 import fr.rowlaxx.utils.ReflectionUtils;
 
-@Return(canReturnInnerType = true)
 public class JsavonBaseConverter extends SimpleConverter<JsavonBase> {
 
 	//Constructeurs
@@ -28,20 +25,7 @@ public class JsavonBaseConverter extends SimpleConverter<JsavonBase> {
 	}
 	
 	//Methodes
-	@ConvertMethod(priority = 0)
-	public <T extends JsavonArray> T toJsavon(JSONObject json) {
-		try {
-			@SuppressWarnings("unchecked")
-			final Class<T> clazz = (Class<T>)getConverter().convert(json.get("class"), Class.class);
-			return toJsavon(json, clazz);
-		}catch(Exception e) {
-			//System.out.println(json.toString(2));
-			throw e;
-		}
-		
-	}
-	
-	@ConvertMethod(priority = 1)
+	@ConvertMethod
 	public <T extends JsavonBase> T toJsavon(Object json, Class<T> destination) {
 		Objects.requireNonNull(json, "json may not be null.");
 		Objects.requireNonNull(destination, "destination may not be null.");
@@ -71,7 +55,7 @@ public class JsavonBaseConverter extends SimpleConverter<JsavonBase> {
 			else
 				value = getValue((JSONArray)json, field);
 			
-			value = getConverter().convert(value, types[i]);
+			value = mainConverter().convert(value, types[i]);
 			ReflectionUtils.trySet(field, instance, value);
 		}
 		

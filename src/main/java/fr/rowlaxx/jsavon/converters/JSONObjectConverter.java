@@ -9,14 +9,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import fr.rowlaxx.convertutils.ConvertMethod;
-import fr.rowlaxx.convertutils.Return;
 import fr.rowlaxx.convertutils.SimpleConverter;
 import fr.rowlaxx.jsavon.Jsavon;
 import fr.rowlaxx.jsavon.JsavonBase;
 import fr.rowlaxx.jsavon.JsavonException;
 import fr.rowlaxx.utils.ReflectionUtils;
 
-@Return(canReturnInnerType = false)
 public class JSONObjectConverter extends SimpleConverter<JSONObject> {
 
 	//Constructeurs
@@ -32,7 +30,7 @@ public class JSONObjectConverter extends SimpleConverter<JSONObject> {
 		final JSONObject json = new JSONObject();
 		final Jsavon.Entry entry = Jsavon.getEntry(base.getClass());
 
-		json.put("class", (String)getConverter().convert(base.getClass(), String.class));
+		json.put("class", (String)mainConverter().convert(base.getClass(), String.class));
 
 		final Field[] fields = entry.getFields();		
 		Object rawValue, newValue;
@@ -58,7 +56,7 @@ public class JSONObjectConverter extends SimpleConverter<JSONObject> {
 			rawValue = entry.getValue();
 			newValue = toJsonItem(rawValue);
 			rawKey = entry.getKey();
-			newKey = getConverter().convert(rawKey, String.class);
+			newKey = mainConverter().convert(rawKey, String.class);
 			
 			System.out.println(rawKey + "  " + rawValue);
 			
@@ -72,11 +70,11 @@ public class JSONObjectConverter extends SimpleConverter<JSONObject> {
 		if (rawValue == null)
 			return null;
 		else if (rawValue instanceof Iterable)
-			return getConverter().convert(rawValue, JSONArray.class);
+			return mainConverter().convert(rawValue, JSONArray.class);
 		else if (rawValue instanceof Map || rawValue instanceof JsavonBase)
-			return getConverter().convert(rawValue, JSONObject.class);
+			return mainConverter().convert(rawValue, JSONObject.class);
 		else if (rawValue instanceof Enum)
-			return getConverter().convert(rawValue, String.class);
+			return mainConverter().convert(rawValue, String.class);
 		else if (rawValue instanceof Boolean || rawValue instanceof Number || rawValue instanceof JSONObject || rawValue instanceof String)
 			return rawValue;
 		else

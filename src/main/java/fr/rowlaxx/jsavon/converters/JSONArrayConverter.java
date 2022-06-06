@@ -7,12 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import fr.rowlaxx.convertutils.ConvertMethod;
-import fr.rowlaxx.convertutils.Return;
 import fr.rowlaxx.convertutils.SimpleConverter;
 import fr.rowlaxx.jsavon.JsavonBase;
 import fr.rowlaxx.jsavon.JsavonException;
 
-@Return(canReturnInnerType = false)
 public class JSONArrayConverter extends SimpleConverter<JSONArray> {
 
 	//Constructeurs
@@ -33,11 +31,11 @@ public class JSONArrayConverter extends SimpleConverter<JSONArray> {
 		if (rawValue == null)
 			return null;
 		else if (rawValue instanceof Collection)
-			return getConverter().convert(rawValue, JSONArray.class);
+			return mainConverter().convert(rawValue, JSONArray.class);
 		else if (rawValue instanceof Map || rawValue instanceof JsavonBase)
-			return getConverter().convert(rawValue, JSONObject.class);
+			return mainConverter().convert(rawValue, JSONObject.class);
 		else if (rawValue instanceof Enum)
-			return getConverter().convert(rawValue, String.class);
+			return mainConverter().convert(rawValue, String.class);
 		else if (rawValue instanceof Boolean || rawValue instanceof Number || rawValue instanceof String || rawValue instanceof JSONObject)
 			return rawValue;
 		else
