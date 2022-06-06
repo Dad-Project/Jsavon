@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import fr.rowlaxx.convertutils.ConvertMethod;
-import fr.rowlaxx.convertutils.SimpleConverter;
+import fr.rowlaxx.convertutils.InnerConverter;
 import fr.rowlaxx.jsavon.Jsavon;
 import fr.rowlaxx.jsavon.JsavonBase;
 import fr.rowlaxx.jsavon.JsavonException;
@@ -17,7 +17,7 @@ import fr.rowlaxx.jsavon.annotations.JOValue;
 import fr.rowlaxx.jsavon.annotations.ManualValue;
 import fr.rowlaxx.utils.ReflectionUtils;
 
-public class JsavonBaseConverter extends SimpleConverter<JsavonBase> {
+public class JsavonBaseConverter extends InnerConverter<JsavonBase> {
 
 	//Constructeurs
 	public JsavonBaseConverter() {

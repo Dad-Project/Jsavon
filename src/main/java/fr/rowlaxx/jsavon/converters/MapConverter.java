@@ -7,11 +7,10 @@ import java.util.Map.Entry;
 import org.json.JSONObject;
 
 import fr.rowlaxx.convertutils.ConvertMethod;
-import fr.rowlaxx.convertutils.converters.MapConverter;
 import fr.rowlaxx.utils.ParameterizedClass;
 import fr.rowlaxx.utils.ReflectionUtils;
 
-public class MapConverterV2 extends MapConverter {
+public class MapConverter extends fr.rowlaxx.convertutils.converters.MapConverter {
 
 	@ConvertMethod
 	public <K, V> Map<K, V> toMap(JSONObject json, ParameterizedClass destination) {
